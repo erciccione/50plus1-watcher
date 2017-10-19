@@ -11,6 +11,7 @@ def toHs(hash)
 	hash / 1000000
 end
 
+while 0 < 1
 
 	# get API of all pools
 
@@ -76,4 +77,7 @@ puts ""
 	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
 	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
-
+		
+	sleep 60
+	system ("clear")
+end
