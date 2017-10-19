@@ -41,14 +41,15 @@ network_hr = network_hr_raw['hashrate']
 	
 	
 attck_hr = ((network_hr / 2) * 1.01 )
+fifty_prcnt = (network_hr / 2)
 pc_hr = 40		# in hs/s
 botnum = (attck_hr / pc_hr)
 
 
-puts "Easy tool who calculates the possibility of a 50+1% attack to the Monero network".bold
+puts "A simple tool which calculates the possibility of a 50+1% attack to the Monero network".bold
 puts ""
 puts "Current global Hashrate:" + " #{toHs(network_hr).round(2)} MH/s".bold
-puts "An attacker should have an hashrate of at least:" + " #{toHs(attck_hr).round(2)} MH/s".bold
+puts "An attacker should have a hashrate of at least:" + " #{toHs(attck_hr).round(2)} MH/s".bold
 puts "or a botnet with" + " #{botnum.to_i} bots.".bold + " (calculated assuming 1 bot = 40 Hs/s)"
 
 
@@ -61,7 +62,7 @@ nanopool_perc = ((nanopool_hr/toHs(network_hr))*100).round(2)
 minergate_perc = ((minergate_hr/network_hr)*100).round(2)
 
 puts ""
-puts "List of bigger mining pools and their hashrate:".italic
+puts "List of major mining pools and their hashrate:".italic
 puts ""
 puts "Dwarfpool:".blue + "	#{dwarfpool_hr.round(2)} MH/s" + "	#{dwarfpool_perc}%".bold + " of the network"
 puts "MineXMR:".blue + "	#{minexmr_hr.round(2)} MH/s" + "	#{minexmr_perc}%".bold + " of the network"
@@ -71,8 +72,8 @@ puts "Nanopool:".blue + "	#{nanopool_hr.round(2)} MH/s" + "	#{nanopool_perc}%".b
 puts "Minergate:".blue + "	#{toHs(minergate_hr).round(2)} MH/s" + "	#{minergate_perc}%".bold + " of the network"
 
 puts ""
-	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr)  >= attck_hr
-	puts "	DANGER: One of the mining pools has 50.01% of the network hashrate !!".red.bold
-	else puts "	None of the pools is close to the 50.01% of the global hashrate".green
+	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr)  > fifty_prcnt
+	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
+	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
 
