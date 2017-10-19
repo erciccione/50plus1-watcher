@@ -41,6 +41,7 @@ network_hr = network_hr_raw['hashrate']
 	
 	
 attck_hr = ((network_hr / 2) * 1.01 )
+fifty_prcnt = (network_hr / 2)
 pc_hr = 40		# in hs/s
 botnum = (attck_hr / pc_hr)
 
@@ -71,8 +72,8 @@ puts "Nanopool:".blue + "	#{nanopool_hr.round(2)} MH/s" + "	#{nanopool_perc}%".b
 puts "Minergate:".blue + "	#{toHs(minergate_hr).round(2)} MH/s" + "	#{minergate_perc}%".bold + " of the network"
 
 puts ""
-	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr)  >= attck_hr
-	puts "	DANGER: One of the mining pools has 50.01% of the network hashrate !!".red.bold
-	else puts "	None of the pools is close to the 50.01% of the global hashrate".green
+	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr)  > fifty_prcnt
+	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
+	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
 
