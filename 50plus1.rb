@@ -35,7 +35,7 @@ nanopool_hr = pools['nanopool'].last
 minergate_hr = minergate_api["pool"]["hashrate"] 
 
 	# get network's Hashrate
-string = open('http://moneroblocks.info/api/get_stats/')
+string = open('https://moneroblocks.info/api/get_stats')
 read_string = string.read
 network_hr_raw = JSON.parse read_string
 network_hr = network_hr_raw['hashrate']
