@@ -6,13 +6,7 @@ I added some fancy coloration, so the script needs the gem 'term/ansicolor'
 to install it digit `gem install term-ansicolor`
 
 ### Fire it up!
-If you have Ruby installed you can open the script typing `ruby 50plus1.rb`.
-
-if you haven't Ruby installed:
-+ add `#!/usr/bin/env` ruby at the top of the script
-+ change the extension from `.rb` to `.sh`
-+ make executable using `chmod +x 50plus1.rb`
-+ run the script
+If Ruby is installed you can open the program typing `ruby 50plus1.rb`, if not run it as a normal script: `./50plus1.rb`
 
 If you have any suggestions/criticism/improvements please open a ticket or make a Pull Request, i would really appreciate it.
 
