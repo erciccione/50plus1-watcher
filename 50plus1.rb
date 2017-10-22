@@ -18,13 +18,11 @@ while 0 < 1
 	# get API of all pools
 
 string = open('http://minexmr.com/pools_hist.json')
-response_status = string.status
 body = string.read
 pools = JSON.parse body
 
 	# get minergate's API
 string = open('http://moneropools.com/getstats.php?site=minergate.com')
-response_status = string.status
 body = string.read
 minergate_api = JSON.parse body
 
