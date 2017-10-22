@@ -13,7 +13,8 @@ def toHs(hash)
 	hash / 1000000
 end
 
-while 0 < 1
+input = "refresh"
+while input == "refresh"
 
 	# get API of all pools
 
@@ -77,7 +78,17 @@ puts ""
 	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
 	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
-		
-	sleep 60
-	system ("clear")
+	
+	puts "
+			------------------------
+	"
+	puts "Type ".italic + "refresh".bold + " to refresh data (new every 60 sec)".italic
+	puts "Type ".italic + "exit".bold + " to close program".italic
+	puts ""
+	input = gets.chomp
+	case input
+	when "exit" then exit! 
+	when "refresh" then system ("clear")
+	else puts "error"
+	end
 end
