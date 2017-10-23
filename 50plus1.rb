@@ -30,10 +30,8 @@ while input == "refresh"
 
 	parse(addrs[:all_pools])
 	pools = JSON.parse @body
-
 	parse(addrs[:minergate])
 	minergate_api = JSON.parse @body
-
 	parse(addrs[:network])
 	network_hr_raw = JSON.parse @body
 
@@ -44,11 +42,10 @@ while input == "refresh"
 	minexmr_hr = pools['minexmr.com'].last
 	miningpoolhub_hr = pools['miningpoolhub'].last
 	nanopool_hr = pools['nanopool'].last
+	supportxmr_hr = pools['supportxmr2'].last
 	minergate_hr = minergate_api["pool"]["hashrate"]
 	network_hr = network_hr_raw['hashrate']
 
-
-	
 	
 	attck_hr = ((network_hr / 2) * 1.01 )
 	fifty_prcnt = (network_hr / 2)
@@ -70,6 +67,8 @@ while input == "refresh"
 	miningpoolhub_perc = ((miningpoolhub_hr/toHs(network_hr))*100).round(2)
 	nanopool_perc = ((nanopool_hr/toHs(network_hr))*100).round(2)
 	minergate_perc = ((minergate_hr/network_hr)*100).round(2)
+	supportxmr_perc = ((supportxmr_hr/toHs(network_hr))*100).round(2)
+
 
 	puts ""
 	puts "List of major mining pools and their hashrate:".italic
@@ -80,9 +79,11 @@ while input == "refresh"
 	puts "Miningpool Hub:".blue + "	#{miningpoolhub_hr.round(2)} MH/s" + "	#{miningpoolhub_perc}%".bold + " of the network"
 	puts "Nanopool:".blue + "	#{nanopool_hr.round(2)} MH/s" + "	#{nanopool_perc}%".bold + " of the network"
 	puts "Minergate:".blue + "	#{toHs(minergate_hr).round(2)} MH/s" + "	#{minergate_perc}%".bold + " of the network"
+	puts "Supportxmr:".blue + "	#{supportxmr_hr.round(2)} MH/s" + "	#{supportxmr_perc}%".bold + " of the network"
 
+	
 	puts ""
-	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr)  > fifty_prcnt
+	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr || supportxmr_hr*1000000)  > fifty_prcnt
 	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
 	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
