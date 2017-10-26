@@ -44,31 +44,34 @@ while input == "refresh"
 	nanopool_hr = pools['nanopool'].last
 	supportxmr_hr = pools['supportxmr2'].last
 	minergate_hr = minergate_api["pool"]["hashrate"]
-	network_hr = network_hr_raw['hashrate']
+	@network_hr = network_hr_raw['hashrate']
 
 	
-	attck_hr = ((network_hr / 2) * 1.01 )
-	fifty_prcnt = (network_hr / 2)
+	attck_hr = ((@network_hr / 2) * 1.01 )
+	fifty_prcnt = (@network_hr / 2)
 	pc_hr = 40		# in hs/s
 	botnum = (attck_hr / pc_hr)
 
 
 	puts "A simple tool which calculates the possibility of a 50+1% attack to the Monero network".bold
 	puts ""
-	puts "Current global Hashrate:" + " #{toHs(network_hr).round(2)} MH/s".bold
+	puts "Current global Hashrate:" + " #{toHs(@network_hr).round(2)} MH/s".bold
 	puts "An attacker should have a hashrate of at least:" + " #{toHs(attck_hr).round(2)} MH/s".bold
 	puts "or a botnet with" + " #{botnum.to_i} bots.".bold + " (calculated assuming 1 bot = 40 Hs/s)"
 
 
-		#calculate percentage
-	dwarfpool_perc = ((dwarfpool_hr/toHs(network_hr))*100).round(2)
-	cryptopool_fr_perc = ((cryptopool_fr_hr/toHs(network_hr))*100).round(2)
-	minexmr_perc = ((minexmr_hr/toHs(network_hr))*100).round(2)
-	miningpoolhub_perc = ((miningpoolhub_hr/toHs(network_hr))*100).round(2)
-	nanopool_perc = ((nanopool_hr/toHs(network_hr))*100).round(2)
-	minergate_perc = ((minergate_hr/network_hr)*100).round(2)
-	supportxmr_perc = ((supportxmr_hr/toHs(network_hr))*100).round(2)
-
+	# calculate percentage and display result (max 2 decimals).
+	def ph(po)
+	((po/toHs(@network_hr))*100).round(2)
+	end
+		
+	dwarfpool_perc = ph(dwarfpool_hr)
+	cryptopool_fr_perc = ph(cryptopool_fr_hr)
+	minexmr_perc = ph(minexmr_hr)
+	miningpoolhub_perc = ph(miningpoolhub_hr)
+	nanopool_perc = ph(nanopool_hr)
+	minergate_perc = ((minergate_hr/@network_hr)*100).round(2)
+	supportxmr_perc = ph(supportxmr_hr)
 
 	puts ""
 	puts "List of major mining pools and their hashrate:".italic
@@ -83,9 +86,17 @@ while input == "refresh"
 
 	
 	puts ""
-	if (dwarfpool_hr*1000000 || cryptopool_fr_hr*1000000 || minexmr_hr*1000000 || miningpoolhub_hr*1000000 || nanopool_hr*1000000 || minergate_hr || supportxmr_hr*1000000)  > fifty_prcnt
+		# array containing hashrate of all pools (not minergate)
+		# TODO: use the following array for code above
+	pools_hr = [dwarfpool_hr, cryptopool_fr_hr, minexmr_hr, miningpoolhub_hr, nanopool_hr, supportxmr_hr]
+	
+	pools_hr.map! {|n| n * 1000000}
+	pools_hr << minergate_hr	# because already in H/s
+	pools_hr.select! {|p| p > fifty_prcnt }
+	if pools_hr.empty? == true
+	puts "	None of these pools are close to >50% of the global hashrate".green
+	else
 	puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
-	else puts "	None of these pools are close to >50% of the global hashrate".green
 	end
 	
 	puts "
