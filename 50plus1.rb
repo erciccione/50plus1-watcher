@@ -36,7 +36,7 @@ while input == "refresh"
 	network_hr_raw = JSON.parse @body
 
 
-		# simplify results
+		# assign values to pools
 	dwarfpool_hr = pools['dwarf'].last
 	cryptopool_fr_hr = pools['monero.crypto-pool.fr'].last
 	minexmr_hr = pools['minexmr.com'].last
