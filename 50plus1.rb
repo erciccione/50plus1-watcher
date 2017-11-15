@@ -8,67 +8,69 @@ class String
   include Term::ANSIColor
 end
 
-def toHs(hash)
-  hash / 1000000
-end
-
-# Get APIs
-addrs = {
-  all_pools: 'http://minexmr.com/pools_hist.json',
-  minergate: 'http://moneropools.com/getstats.php?site=minergate.com',
-  network: 'https://moneroblocks.info/api/get_stats'
-}
-
-def parse(apis)
-  string = open(apis)
-  @body = string.read
-end
-
-parse(addrs[:all_pools])
-  pools = JSON.parse @body
-parse(addrs[:minergate])
-  minergate_api = JSON.parse @body
-parse(addrs[:network])
-  network_hr_raw = JSON.parse @body
-
-# Assign values to pools
-dwarfpool_hr = pools['dwarf'].last
-cryptopool_fr_hr = pools['monero.crypto-pool.fr'].last
-minexmr_hr = pools['minexmr.com'].last
-miningpoolhub_hr = pools['miningpoolhub'].last
-nanopool_hr = pools['nanopool'].last
-supportxmr_hr = pools['supportxmr2'].last
-minergate_hr = minergate_api["pool"]["hashrate"]
-@network_hr = network_hr_raw['hashrate']
-
-# Operations with global hashrate
-attck_hr = ((@network_hr / 2) * 1.01 )
-fifty_prcnt = (@network_hr / 2)
-SINGLEBOT = 40		# in hs/s
-botnum = (attck_hr / SINGLEBOT)
-	
-# Calculate percentage and show results using max 2 decimals
-def ph(po)
-  ((po/toHs(@network_hr))*100).round(2)
-end
-
-dwarfpool_perc = ph(dwarfpool_hr)
-cryptopool_fr_perc = ph(cryptopool_fr_hr)
-minexmr_perc = ph(minexmr_hr)
-miningpoolhub_perc = ph(miningpoolhub_hr)
-nanopool_perc = ph(nanopool_hr)
-minergate_perc = ((minergate_hr/@network_hr)*100).round(2)
-supportxmr_perc = ph(supportxmr_hr)
-	
-# Calculate if any pool > 50%
-pools_hr = [dwarfpool_hr, cryptopool_fr_hr, minexmr_hr, miningpoolhub_hr, nanopool_hr, supportxmr_hr]
-  pools_hr.map! {|n| n * 1000000}
-  pools_hr << minergate_hr	# because already in H/s
-  pools_hr.select! {|p| p > fifty_prcnt }
-
 input = "refresh"
 while input == "refresh"
 
+  # Get APIs
+  addrs = {
+    all_pools: 'http://minexmr.com/pools_hist.json',
+    minergate: 'http://moneropools.com/getstats.php?site=minergate.com',
+    network: 'https://moneroblocks.info/api/get_stats'
+  }
+  
+  def parse(apis)
+    string = open(apis)
+    @body = string.read
+  end
+  
+  parse(addrs[:all_pools])
+    pools = JSON.parse @body
+  parse(addrs[:minergate])
+    minergate_api = JSON.parse @body
+  parse(addrs[:network])
+    network_hr_raw = JSON.parse @body
+    
+  # Convert H/s -> MH/s
+  def toHs(hash)
+    hash / 1000000
+  end
+  
+  # Assign values to pools. New pools must be added here
+  pools_all = {
+    "Dwarfpool": pools['dwarf'].last,
+    "Cryptopool": pools['monero.crypto-pool.fr'].last,
+    "MineXMR ": pools['minexmr.com'].last,
+    "Miningpool Hub": pools['miningpoolhub'].last,
+    "Nanopool": pools['nanopool'].last,
+    "Supportxmr": pools['supportxmr2'].last
+  }
+  
+  # Get Network's Hashrate
+  @network_hr = network_hr_raw['hashrate']
+  
+  # Operations with global hashrate
+  attck_hr = ((@network_hr / 2) * 1.01 )
+  fifty_prcnt = (@network_hr / 2)
+  SINGLEBOT = 40		# in hs/s
+  botnum = (attck_hr / SINGLEBOT)
+   
+  # Calculate percentage and show results using max 2 decimals
+  def ph(po)
+    ((po/toHs(@network_hr))*100).round(2)
+  end
+   
+  # Calculate if any pool has > 50% of the hashrate
+  status = "safe"
+  pools_all.each_value {|p| 
+    n = p * 1000000 # Convert MH/s -> H/s
+    if n > fifty_prcnt then status = "danger"
+    else status = "safe"
+    end
+  }   
+  # Add Minergate to Hash
+  pools_all[:"Minergate"] = toHs(minergate_api["pool"]["hashrate"])	# because already in H/s 
+  
+  # Output on screen
   puts "A simple tool which calculates the possibility of a 50+1% attack to the Monero network".bold
   puts ""
   puts "Current global Hashrate:" + " #{toHs(@network_hr).round(2)} MH/s".bold
@@ -78,31 +80,30 @@ while input == "refresh"
   
   puts "List of major mining pools and their hashrate:".italic
   puts ""
-  puts "Dwarfpool:".blue + "	#{dwarfpool_hr.round(2)} MH/s" + "	#{dwarfpool_perc}%".bold + " of the network"
-  puts "MineXMR:".blue + "	#{minexmr_hr.round(2)} MH/s" + "	#{minexmr_perc}%".bold + " of the network"
-  puts "Cryptopool:".blue + "	#{cryptopool_fr_hr.round(2)} MH/s" + "	#{cryptopool_fr_perc}%".bold + " of the network"
-  puts "Miningpool Hub:".blue + "	#{miningpoolhub_hr.round(2)} MH/s" + "	#{miningpoolhub_perc}%".bold + " of the network"
-  puts "Nanopool:".blue + "	#{nanopool_hr.round(2)} MH/s" + "	#{nanopool_perc}%".bold + " of the network"
-  puts "Minergate:".blue + "	#{toHs(minergate_hr).round(2)} MH/s" + "	#{minergate_perc}%".bold + " of the network"
-  puts "Supportxmr:".blue + "	#{supportxmr_hr.round(2)} MH/s" + "	#{supportxmr_perc}%".bold + " of the network"
+  
+  # Print pools, hashrate and percent of total hashrate
+  pools_all.each {|k,v, prcnt|
+  prcnt = ph(v)
+  puts "#{k}:".blue + "	#{v.round(2)} MH/s" + "	#{prcnt}%".bold + " of the network"
+  }
   puts ""
-
-  if pools_hr.empty? == true
-      puts "	None of these pools are close to >50% of the global hashrate".green
-    else
-      puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
+  
+  if status == "safe"
+    puts "	None of these pools are close to >50% of the global hashrate".green
+  else
+    puts "	DANGER: One of the mining pools has reached >50% of the network hashrate !!".red.bold
   end
-
-  puts "
-			------------------------
-	"
+  
+  puts ""
   puts "Type ".italic + "refresh".bold + " to refresh data (new every 60 sec)".italic
   puts "Type ".italic + "exit".bold + " to close program".italic
-	
+  puts ""
+  
+  # Add exit from loop
   input = gets.chomp
   case input
-    when "exit" then exit! 
-    when "refresh" then system ("clear")
-    else puts "error"
+  when "exit" then exit! 
+  when "refresh" then system ("clear")
+  else puts "error"
   end
 end
